@@ -1,8 +1,7 @@
 use clap::Parser;
-mod cli;
 
 fn main() {
-    let cli = cli::Cli::parse();
+    let cli = deploy_lambda_function::cli::Cli::parse();
 
     println!("region: {:?}", cli.region);
 }
