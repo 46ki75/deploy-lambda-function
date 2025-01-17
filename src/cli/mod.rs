@@ -8,9 +8,15 @@ use clap::Parser;
 )]
 #[command(author = "Chomolungma Shirayuki <shirayuki@46ki75.com>")]
 pub struct Cli {
+    /// The AWS profile to use for deployment.
+    #[arg(long)]
+    pub profile: Option<String>,
+
+    /// The AWS region to deploy the Lambda function to.
     #[arg(long)]
     pub region: Option<String>,
 
+    /// The name of the Lambda function to deploy.
     #[arg(long)]
-    pub profile: Option<String>,
+    pub function_name: String,
 }
