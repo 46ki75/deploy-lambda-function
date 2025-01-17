@@ -1,5 +1,8 @@
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
+    #[error("Invalid Option: {0}")]
+    InvalidOption(String),
+
     #[error("Failed to create temp dir")]
     TempDir(#[from] std::io::Error),
 
