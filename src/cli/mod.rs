@@ -40,12 +40,9 @@ pub struct Cli {
     #[arg(long)]
     pub s3_key: Option<String>,
 
-    /// A description for the version to override the description in the function configuration. (PublishVersion)
-    ///
-    /// - Length Constraints: Minimum length of 0. Maximum length of 256.
+    /// Set to true to publish a new version of the function after updating the code.
     #[arg(long)]
-    #[arg(value_parser = validate::validate_description)]
-    pub description: Option<String>,
+    pub publish: bool,
 }
 
 #[cfg(test)]
