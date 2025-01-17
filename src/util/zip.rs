@@ -1,7 +1,12 @@
 use std::io::{Read, Write};
 
 pub async fn archive_to_zip_bytes(directory_path: &str) -> Result<Vec<u8>, crate::error::Error> {
-    println!("Create archive from directory: {:?}", directory_path);
+    let absolute_directory_path = std::path::Path::new(directory_path).canonicalize()?;
+
+    println!(
+        "Create archive from directory: {:?}",
+        absolute_directory_path
+    );
 
     let mut zip_bytes = Vec::new();
 
@@ -12,14 +17,16 @@ pub async fn archive_to_zip_bytes(directory_path: &str) -> Result<Vec<u8>, crate
             .compression_method(zip::CompressionMethod::Deflated)
             .unix_permissions(0o755);
 
-    println!("Exploring directory: {:?}", directory_path);
+    println!("Exploring directory: {:?}", absolute_directory_path);
 
-    for entry in walkdir::WalkDir::new(directory_path) {
+    for entry in walkdir::WalkDir::new(&absolute_directory_path) {
         let entry = entry?;
         let path = entry.path();
 
         if path.is_file() {
-            let file_name = path.strip_prefix(directory_path)?;
+            let absolute_path = path.canonicalize()?;
+
+            let file_name = absolute_path.strip_prefix(&absolute_directory_path)?;
             zip_writer.start_file(file_name.to_string_lossy(), options.clone())?;
 
             let mut file = std::fs::File::open(path)?;
@@ -32,7 +39,7 @@ pub async fn archive_to_zip_bytes(directory_path: &str) -> Result<Vec<u8>, crate
 
             println!("Added file: {:?}", file_name);
         } else if path.is_dir() {
-            let dir_name = path.strip_prefix("./")?;
+            let dir_name = path.strip_prefix(&absolute_directory_path)?;
             zip_writer.add_directory(dir_name.to_string_lossy(), options.clone())?;
         }
     }
@@ -56,8 +63,27 @@ pub async fn save_bytes_to_file(
 mod tests {
 
     #[tokio::test]
-    async fn test_zip() {
+    async fn test_zip_relative() {
         let result = super::archive_to_zip_bytes("./src").await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_zip_relative_abstruct() {
+        let result = super::archive_to_zip_bytes("src").await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_zip_absolute() {
+        let result = super::archive_to_zip_bytes(
+            std::path::Path::new("src")
+                .canonicalize()
+                .unwrap()
+                .to_str()
+                .unwrap(),
+        )
+        .await;
         assert!(result.is_ok());
     }
 }
