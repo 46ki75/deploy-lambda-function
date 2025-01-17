@@ -1,3 +1,8 @@
+use clap::Parser;
+mod cli;
+
 fn main() {
-    deploy_lambda_function::greet();
+    let cli = cli::Cli::parse();
+
+    println!("region: {:?}", cli.region);
 }
