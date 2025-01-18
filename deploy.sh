@@ -3,7 +3,7 @@
 POLLING_INTERVAL=3
 
 if [ $# -lt 2 ]; then
-    echo "Usage: $0 <directory-path> <function-name> [alias-name]"
+    echo "Usage:   $0 <directory-path> <function-name> [alias-name]"
     echo "Example: $0 ./dist my-function my-alias"
     exit 1
 fi
