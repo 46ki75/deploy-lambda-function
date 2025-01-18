@@ -13,9 +13,7 @@ pub async fn archive_to_zip_bytes(directory_path: &str) -> Result<Vec<u8>, crate
     let mut zip_writer = zip::ZipWriter::new(std::io::Cursor::new(&mut zip_bytes));
 
     let options: zip::write::FileOptions<zip::write::ExtendedFileOptions> =
-        zip::write::FileOptions::default()
-            .compression_method(zip::CompressionMethod::Deflated)
-            .unix_permissions(0o755);
+        zip::write::FileOptions::default().compression_method(zip::CompressionMethod::Deflated);
 
     println!("Exploring directory: {:?}", absolute_directory_path);
 
@@ -26,8 +24,11 @@ pub async fn archive_to_zip_bytes(directory_path: &str) -> Result<Vec<u8>, crate
         if path.is_file() {
             let absolute_path = path.canonicalize()?;
 
-            let file_name = absolute_path.strip_prefix(&absolute_directory_path)?;
-            zip_writer.start_file(file_name.to_string_lossy(), options.clone())?;
+            let file_name = absolute_path
+                .strip_prefix(&absolute_directory_path)?
+                .to_string_lossy();
+
+            zip_writer.start_file(&file_name, options.clone())?;
 
             let mut file = std::fs::File::open(path)?;
 
@@ -38,9 +39,6 @@ pub async fn archive_to_zip_bytes(directory_path: &str) -> Result<Vec<u8>, crate
             zip_writer.write_all(&buffer)?;
 
             println!("Added file: {:?}", file_name);
-        } else if path.is_dir() {
-            let dir_name = path.strip_prefix(&absolute_directory_path)?;
-            zip_writer.add_directory(dir_name.to_string_lossy(), options.clone())?;
         }
     }
 
