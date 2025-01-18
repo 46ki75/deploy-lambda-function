@@ -3,8 +3,9 @@
 POLLING_INTERVAL=3
 
 if [ $# -lt 2 ]; then
-    echo "Usage:   $0 <directory-path> <function-name> [alias-name]"
-    echo "Example: $0 ./dist my-function my-alias"
+    printf "\nUsage:\n    $0 <directory-path> <function-name> [alias-name]\n"
+    printf "\nExample 1:\n    $0 ./dist my-function\n"
+    printf "\nExample 2:\n    $0 ./dist my-function my-alias\n"
     exit 1
 fi
 
